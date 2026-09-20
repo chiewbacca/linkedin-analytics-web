@@ -1,0 +1,54 @@
+{
+  "updatedAt": "2026-09-20T12:06:05+08:00",
+  "notes": "Source: LinkedIn analytics scrape 20 Sep 2026 (Recruiter Networking, read-only). LinkedIn does not expose a daily profile-view series. Overlay uses per-post profile viewers + post dates + 7-day impressions. 90-day profile views are a period total only.",
+  "limits": [
+    "No daily profile-view time series (Past 90 days total only)",
+    "Post ages are approximate from LinkedIn cards (~4d / ~3mo / ~10mo)"
+  ],
+  "kpis": {
+    "profileViews90d": 940,
+    "profileViewsDeltaPct": 181,
+    "recruiters": 13,
+    "followers": 3614,
+    "followersDeltaPct": 1,
+    "postImpressions7d": 11061,
+    "postImpressionsDeltaPct": 1837,
+    "searchAppearances": 228,
+    "searchAppearancesWindow": "2026-09-08 to 2026-09-14",
+    "postsThisWeek": 1
+  },
+  "content7d": {
+    "window": "2026-09-14 to 2026-09-20 UTC",
+    "impressions": 11061,
+    "membersReached": 6565,
+    "inNetworkPct": 20,
+    "outNetworkPct": 80,
+    "engagement": 110,
+    "reactions": 96,
+    "comments": 2,
+    "reposts": 1,
+    "saves": 6,
+    "sends": 5
+  },
+  "viewerEmployers": [
+    {"name": "Chubb", "views": 41},
+    {"name": "Standard Chartered", "views": 13},
+    {"name": "ADVANCE2RISE ITES", "views": 4}
+  ],
+  "foundVia": [{"name": "Homepage", "count": 137}],
+  "followerGainDaily": [
+    {"date": "2026-09-14", "cumulative": 0},
+    {"date": "2026-09-15", "cumulative": 37},
+    {"date": "2026-09-16", "cumulative": 42},
+    {"date": "2026-09-17", "cumulative": 44},
+    {"date": "2026-09-18", "cumulative": 45},
+    {"date": "2026-09-19", "cumulative": 47},
+    {"date": "2026-09-20", "cumulative": 47}
+  ],
+  "posts": [
+    {"title": "CISO APAC GI hire", "approxAge": "~4d", "date": "2026-09-16", "impressions": 10508, "impressionsPeriodApprox": 11061, "reactions": 97, "comments": 2, "reposts": 6, "profileViewers": 123, "followersGained": 33},
+    {"title": "AI intern", "approxAge": "~3mo", "date": "2026-06-20", "impressions": 19466, "impressionsPeriodApprox": null, "reactions": 179, "comments": 6, "reposts": 12, "profileViewers": 201, "followersGained": 17},
+    {"title": "AI Apprentice", "approxAge": "~10mo", "date": "2025-11-20", "impressions": 25862, "impressionsPeriodApprox": null, "reactions": 150, "comments": 2, "reposts": 11, "profileViewers": 158, "followersGained": 21}
+  ],
+  "demographics7d": {"companySize10001plusPct": 44, "seniorPct": 34, "itServicesPct": 22, "singaporePct": 16, "chubbPct": 9}
+}

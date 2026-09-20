@@ -1,3 +1,5 @@
 # LinkedIn analytics (public site)
 
-Public deploy-only page. Private source: `linkedin-analytics-private`.
+Deploy-only public site. Source of truth: private repo `linkedin-analytics-private`.
+
+Live data in `data/linkedin-metrics.json`.

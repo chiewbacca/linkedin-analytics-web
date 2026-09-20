@@ -1,45 +1,213 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>LinkedIn analytics - Alan Chiew</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-body{margin:0;font-family:system-ui,sans-serif;background:#0f1115;color:#e8eaef;padding:2rem 1.25rem}
-.wrap{max-width:960px;margin:0 auto}
-h1{font-size:1.5rem;margin:0 0 .5rem}
-.sub,.meta,.note,footer{color:#9aa3b2;font-size:.9rem}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:1.5rem 0}
-@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}}
-.card{background:#171a21;border:1px solid #2a2f3a;border-radius:12px;padding:1rem}
-.label{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9aa3b2}
-.value{font-size:1.6rem;font-weight:650;margin-top:.2rem}
-.delta{color:#3ecf8e}
-table{width:100%;border-collapse:collapse;margin-top:1rem}
-th,td{text-align:left;padding:.5rem;border-bottom:1px solid #2a2f3a;font-size:.9rem}
-th{color:#9aa3b2;font-size:.72rem;text-transform:uppercase}
-.panel{background:#171a21;border:1px solid #2a2f3a;border-radius:12px;padding:1.25rem;margin:1rem 0}
-</style></head><body><div class="wrap">
+:root {
+--bg: #0f1115; --panel: #171a21; --border: #2a2f3a;
+--text: #e8eaef; --muted: #9aa3b2; --accent: #5b8cff;
+--accent2: #3ecf8e; --warn: #f0b429;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+h1 { font-size: 1.6rem; font-weight: 650; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+.sub { color: var(--muted); font-size: 0.95rem; max-width: 44rem; }
+.meta { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; margin-top: 1rem; font-size: 0.85rem; color: var(--muted); }
+.meta strong { color: var(--text); }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.5rem 0; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem 1.2rem; }
+.card .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.card .value { font-size: 1.65rem; font-weight: 650; margin-top: 0.2rem; }
+.card .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+.delta { color: var(--accent2); }
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.panel h2 { font-size: 1rem; margin: 0 0 1rem; font-weight: 600; }
+.chart-box { position: relative; height: 300px; }
+.note { font-size: 0.85rem; color: var(--muted); margin: 0 0 1rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.55rem 0.4rem; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 500; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+footer { margin-top: 2rem; font-size: 0.8rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
 <h1>LinkedIn analytics</h1>
-<p class="sub">Data-based profile reach and posting. Scraped from LinkedIn analytics (read-only). Never invented.</p>
-<p class="meta">Updated: 2026-09-20T12:06:05+08:00 SGT · Source: LinkedIn dashboard</p>
+<p class="sub">Data-based view of profile reach and posting. Built to judge optimizing work before wider rollout. Numbers are scraped from LinkedIn analytics, never invented.</p>
+<div class="meta">
+<span>Updated: <strong id="updatedAt">-</strong></span>
+<span>Source: <strong>LinkedIn dashboard (read-only)</strong></span>
+</div>
+</header>
 <div class="grid">
-<div class="card"><div class="label">Profile views (90d)</div><div class="value">940</div><div class="delta">+181% vs prior</div></div>
-<div class="card"><div class="label">Post impressions (7d)</div><div class="value">11,061</div><div class="delta">+1837% vs prior</div></div>
-<div class="card"><div class="label">Followers</div><div class="value">3,614</div><div class="delta">+1% vs prior</div></div>
-<div class="card"><div class="label">Search appearances</div><div class="value">228</div><div class="note">2026-09-08 to 2026-09-14</div></div>
+<div class="card">
+<div class="label">Profile views (90d)</div>
+<div class="value" id="kpiViews">-</div>
+<div class="hint" id="kpiViewsDelta"></div>
+</div>
+<div class="card">
+<div class="label">Post impressions (7d)</div>
+<div class="value" id="kpiImpr">-</div>
+<div class="hint" id="kpiImprDelta"></div>
+</div>
+<div class="card">
+<div class="label">Followers</div>
+<div class="value" id="kpiFollowers">-</div>
+<div class="hint" id="kpiFollowersDelta"></div>
+</div>
+<div class="card">
+<div class="label">Search appearances</div>
+<div class="value" id="kpiSearch">-</div>
+<div class="hint" id="kpiSearchWin"></div>
+</div>
 </div>
 <div class="panel">
-<h2 style="margin:0 0 .5rem;font-size:1rem">Overlay: profile viewers per post</h2>
-<p class="note">LinkedIn has no daily profile-view series. Best overlay is profile viewers attributed to each post vs lifetime impressions. Normalized column = viewers per 1k impressions.</p>
-<table><thead><tr><th>Date</th><th>Title</th><th>Impressions</th><th>Profile viewers</th><th>Viewers / 1k</th><th>Followers gained</th></tr></thead>
-<tbody><tr><td>2026-09-16</td><td>CISO APAC GI hire</td><td>10,508</td><td>123</td><td>11.7</td><td>33</td></tr><tr><td>2026-06-20</td><td>AI intern</td><td>19,466</td><td>201</td><td>10.3</td><td>17</td></tr><tr><td>2025-11-20</td><td>AI Apprentice</td><td>25,862</td><td>158</td><td>6.1</td><td>21</td></tr></tbody></table>
+<h2>Overlay: profile viewers per post</h2>
+<p class="note">LinkedIn does not publish a daily profile-view series. Best available overlay is profile viewers attributed to each post (green) vs lifetime impressions (blue).</p>
+<div class="chart-box"><canvas id="overlayChart"></canvas></div>
 </div>
 <div class="panel">
-<h2 style="margin:0 0 .5rem;font-size:1rem">Follower gain (7d cumulative)</h2>
-<p class="note">Sep 14: 0 · 15: 37 · 16: 42 · 17: 44 · 18: 45 · 19: 47 · 20: 47</p>
+<h2>Normalized: profile viewers per 1k impressions</h2>
+<div class="chart-box"><canvas id="normChart"></canvas></div>
 </div>
 <div class="panel">
-<h2 style="margin:0 0 .5rem;font-size:1rem">Top viewer employers (90d)</h2>
-<ul><li>Chubb: 41</li><li>Standard Chartered: 13</li><li>ADVANCE2RISE ITES: 4</li></ul>
+<h2>Follower gain (7d cumulative)</h2>
+<div class="chart-box"><canvas id="followerChart"></canvas></div>
 </div>
-<footer><p>Source: LinkedIn analytics scrape 20 Sep 2026 (Recruiter Networking, read-only). LinkedIn does not expose a daily profile-view series. Overlay uses per-post profile viewers + post dates + 7-day impressions. 90-day profile views are a period total only.</p><p>No daily profile-view time series (Past 90 days total only) · Post ages are approximate from LinkedIn cards (~4d / ~3mo / ~10mo)</p></footer>
-</div></body></html>
+<div class="panel">
+<h2>Posts</h2>
+<div style="overflow-x:auto">
+<table>
+<thead>
+<tr>
+<th>Date (approx)</th><th>Title</th><th>Impressions</th>
+<th>Profile viewers</th><th>Viewers / 1k impr</th><th>Followers gained</th>
+</tr>
+</thead>
+<tbody id="postsBody"></tbody>
+</table>
+</div>
+</div>
+<div class="panel">
+<h2>Top viewer employers (90d sample)</h2>
+<div class="chart-box" style="height:220px"><canvas id="employerChart"></canvas></div>
+</div>
+<footer>
+<p id="notes"></p>
+<p id="limits"></p>
+</footer>
+</div>
+<script>
+function fmt(n) {
+if (n == null || Number.isNaN(n)) return '-';
+return new Intl.NumberFormat('en-GB').format(n);
+}
+function pct(n) {
+if (n == null) return '';
+const sign = n > 0 ? '+' : '';
+return sign + n + '% vs prior period';
+}
+async function main() {
+const res = await fetch('data/linkedin-metrics.json?t=' + Date.now());
+const data = await res.json();
+const k = data.kpis || {};
+const posts = data.posts || [];
+document.getElementById('updatedAt').textContent = data.updatedAt
+? new Date(data.updatedAt).toLocaleString('en-GB', { timeZone: 'Asia/Singapore', dateStyle: 'medium', timeStyle: 'short' }) + ' SGT'
+: '-';
+document.getElementById('notes').textContent = data.notes || '';
+document.getElementById('limits').textContent = (data.limits || []).join(' · ');
+document.getElementById('kpiViews').textContent = fmt(k.profileViews90d);
+document.getElementById('kpiViewsDelta').innerHTML = '<span class="delta">' + pct(k.profileViewsDeltaPct) + '</span>';
+document.getElementById('kpiImpr').textContent = fmt(k.postImpressions7d);
+document.getElementById('kpiImprDelta').innerHTML = '<span class="delta">' + pct(k.postImpressionsDeltaPct) + '</span>';
+document.getElementById('kpiFollowers').textContent = fmt(k.followers);
+document.getElementById('kpiFollowersDelta').innerHTML = '<span class="delta">' + pct(k.followersDeltaPct) + '</span>';
+document.getElementById('kpiSearch').textContent = fmt(k.searchAppearances);
+document.getElementById('kpiSearchWin').textContent = k.searchAppearancesWindow || '';
+const labels = posts.map(p => p.title);
+const viewers = posts.map(p => p.profileViewers);
+const imprs = posts.map(p => p.impressions);
+const norm = posts.map(p => p.impressions ? +(1000 * p.profileViewers / p.impressions).toFixed(1) : null);
+new Chart(document.getElementById('overlayChart'), {
+type: 'bar',
+data: {
+labels,
+datasets: [
+{ label: 'Lifetime impressions', data: imprs, backgroundColor: 'rgba(91,140,255,0.55)', yAxisID: 'y' },
+{ label: 'Profile viewers from post', data: viewers, backgroundColor: 'rgba(62,207,142,0.75)', yAxisID: 'y1' }
+]
+},
+options: {
+responsive: true, maintainAspectRatio: false,
+scales: {
+x: { ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' } },
+y: { position: 'left', beginAtZero: true, ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' }, title: { display: true, text: 'Impressions', color: '#9aa3b2' } },
+y1: { position: 'right', beginAtZero: true, ticks: { color: '#9aa3b2' }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Profile viewers', color: '#9aa3b2' } }
+},
+plugins: { legend: { labels: { color: '#e8eaef' } } }
+}
+});
+new Chart(document.getElementById('normChart'), {
+type: 'bar',
+data: { labels, datasets: [{ label: 'Profile viewers per 1k impressions', data: norm, backgroundColor: '#f0b429' }] },
+options: {
+responsive: true, maintainAspectRatio: false,
+scales: {
+x: { ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' } },
+y: { beginAtZero: true, ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' } }
+},
+plugins: { legend: { labels: { color: '#e8eaef' } } }
+}
+});
+const fg = data.followerGainDaily || [];
+new Chart(document.getElementById('followerChart'), {
+type: 'line',
+data: {
+labels: fg.map(r => r.date),
+datasets: [{ label: 'Cumulative followers gained (week)', data: fg.map(r => r.cumulative), borderColor: '#5b8cff', backgroundColor: 'rgba(91,140,255,0.12)', fill: true, tension: 0.25 }]
+},
+options: {
+responsive: true, maintainAspectRatio: false,
+scales: {
+x: { ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' } },
+y: { beginAtZero: true, ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' } }
+},
+plugins: { legend: { labels: { color: '#e8eaef' } } }
+}
+});
+const emps = data.viewerEmployers || [];
+new Chart(document.getElementById('employerChart'), {
+type: 'bar',
+data: { labels: emps.map(e => e.name), datasets: [{ label: 'Views', data: emps.map(e => e.views), backgroundColor: '#5b8cff' }] },
+options: {
+indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+scales: {
+x: { beginAtZero: true, ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' } },
+y: { ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' } }
+},
+plugins: { legend: { display: false } }
+}
+});
+document.getElementById('postsBody').innerHTML = posts.map(p => {
+const n = p.impressions ? (1000 * p.profileViewers / p.impressions).toFixed(1) : '-';
+return `<tr>
+<td>${p.date || '-'} <span style="color:var(--muted)">(${p.approxAge || ''})</span></td>
+<td>${(p.title || '-').replace(/</g,'&lt;')}</td>
+<td>${fmt(p.impressions)}</td>
+<td>${fmt(p.profileViewers)}</td>
+<td>${n}</td>
+<td>${fmt(p.followersGained)}</td>
+</tr>`;
+}).join('');
+}
+main().catch(err => { document.body.insertAdjacentHTML('afterbegin', '<p style="color:#f0b429;padding:1rem">Could not load data: ' + err + '</p>'); });
+</script>
+</body>
+</html>
